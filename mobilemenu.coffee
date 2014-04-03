@@ -1,0 +1,3 @@
+class HikariJqueryMenu
+    constructor: ->
+        @log

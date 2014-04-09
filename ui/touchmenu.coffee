@@ -31,7 +31,9 @@ class HikariTouchMenu
 
     constructor: (@element, @options) ->
         @body = $('body')
+        @stack = []
         default_options =
+            body: true
             position: 'left'
             clone: true
         @options = $.extend(default_options, @options)
@@ -44,7 +46,7 @@ class HikariTouchMenu
         @element.data 'touchmenu-instance', this
         @element.addClass 'touchmenu'
         @element.appendTo @body
-        $(window).trigger 'touchmenu-init', this
+        @element.trigger 'touchmenu-init', this
         log 'ctor'
         log @options
         switch @options.position
@@ -69,11 +71,33 @@ class HikariTouchMenu
         @overlay.appendTo @body
         @overlay.on 'click', @close
         $(window).on 'resize', @reset
+        @element.on 'click', (event) =>
+            target = $(event.target)
+            li = target.closest 'li'
+            ul = li.find '> ul'
+            if ul.length
+                event.preventDefault()
+                ul.css
+                    backgroundColor: '#666'
+                    position: 'fixed'
+                    left: @size()
+                    top: 0
+                    bottom: 0
+                    width: @size()
+                    zIndex: 9000 + @stack.length
+                @stack.push ul
+                ul.show()
+                ul.animate
+                    left: '0px'
+                @element.animate
+                    left: '-=' + 20 + 'px'
         @reset()
 
     reset: () =>
         log 'reset'
         @overlay.fadeOut()
+        @element.find('ul ul').hide()
+        @stack = []
         @element.show()
         css =
             position: 'fixed'
@@ -84,6 +108,12 @@ class HikariTouchMenu
         css[@options.position] = -@size()
         @element.css css
         @element.fadeOut()
+        if @options.body
+            css =
+                position: 'relative'
+                overflow: 'auto'
+            css[@options.position] = 0
+            @body.css css
 
     # progress 0.0 to 1.0
     progress: () =>
@@ -107,21 +137,38 @@ class HikariTouchMenu
         @element.show()
         @overlay.fadeIn()
         css = {}
-        css[@options.position] = 0
         options =
-            #complete: =>
-            #    @overlay.fadeIn()
-        @element.animate css, options
+            complete: =>
+                console.log 'complete'
+        if @options.body
+            @element.css
+                top: 0
+                left: '-' + @size() + 'px'
+                position: 'absolute'
+                height: $(window).innerHeight()
+            @body.css
+                position: 'absolute'
+                overflow: 'hidden'
+                width: '100%'
+            css[@options.position] = '+=' + @size()
+            @body.animate css, options
+        else
+            css[@options.position] = 0
+            @element.animate css, options
 
     close: () =>
         log 'close'
         css = {}
-        css[@options.position] = -@size()
         options =
             complete: =>
                 @element.hide()
                 @reset()
-        @element.animate css, options
+        if @options.body
+            css[@options.position] = 0
+            @body.animate css, options
+        else
+            css[@options.position] = -@size()
+            @element.animate css, options
 
     is_open: () =>
         return not @is_closed()

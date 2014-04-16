@@ -33,9 +33,23 @@ class HikariTouchMenu
         @body = $('body')
         @stack = []
         default_options =
-            body: true
-            position: 'left'
-            clone: true
+            debug: true           # enable console logging
+            body: true            # attach to and push with body
+            position: 'left'      # menu slidein position
+            clone: true           # clone menu element
+            animation:
+                duration: 500     # duration for open & close animations
+            stack:
+                enable: true      # enable submenu navigation
+                parallax: 20      # amount to push parent menus
+                offset: 0         # final offset to previous menu
+                direction: 'auto' # stack slidein direction (auto = opposite of menu direction)
+            touch:
+                enable: true      # enable touch events
+                snap: 50          # snap distance
+            overlay:
+                enable: true      # enable body overlay
+
         @options = $.extend(default_options, @options)
         if @options.clone
             @element = @element.clone()

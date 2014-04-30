@@ -18,7 +18,9 @@ class HikariTouchMenu
             if target.length
                 menu = target.data 'touchmenu-instance'
                 if not menu
-                    menu = new HikariTouchMenu target
+                    options = target.data 'touchmenu-options'
+                    log options
+                    menu = new HikariTouchMenu target, options
                     item.data 'touchmenu', '#' + menu.id
         $('body').on 'click', '[data-touchmenu]', (event) ->
             id = $(this).data 'touchmenu'
@@ -115,10 +117,14 @@ class HikariTouchMenu
         @element.show()
         css =
             position: 'fixed'
-            top: 0 # TODO: @options.pos
-            bottom: 0
-            left: 0
             zIndex: 9001
+        switch @options.position
+            when 'left', 'right'
+                css.top = 0
+                css.bottom = 0
+            when 'top', 'bottom'
+                css.left = 0
+                css.right = 0
         css[@options.position] = -@size()
         @element.css css
         @element.fadeOut()
@@ -156,10 +162,15 @@ class HikariTouchMenu
                 console.log 'complete'
         if @options.body
             @element.css
-                top: 0
-                left: '-' + @size() + 'px'
                 position: 'absolute'
-                height: $(window).innerHeight()
+            switch @options.position
+                when 'left', 'right'
+                    css.top = 0
+                    css.height = $(window).innerHeight()
+                when 'top', 'bottom'
+                    css.left = 0
+                    css.width = $(window).innerWidth()
+            @element.css @options.position, '-' + @size() + 'px'
             @body.css
                 position: 'absolute'
                 overflow: 'hidden'

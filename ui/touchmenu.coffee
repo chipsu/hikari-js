@@ -19,7 +19,7 @@ class HikariTouchMenu
                 menu = target.data 'touchmenu-instance'
                 if not menu
                     options = target.data 'touchmenu-options'
-                    if options.position == 'auto'
+                    if options and options.position == 'auto'
                         pos = item.offset().left + item.outerWidth()
                         options.position = if pos < $(window).innerWidth() then 'left' else 'right'
                     menu = new HikariTouchMenu target, options

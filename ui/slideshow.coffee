@@ -11,7 +11,7 @@ class @HUiSlideshow extends HCoreComponent
                 enable: true      # enable touch events
                 snap: 50          # snap distance
             overlay:
-                enable: true      # enable body overlay
+                enable: true      # enable overlay
 
     next: () =>
         @log 'Next'

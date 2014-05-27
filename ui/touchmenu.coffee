@@ -12,9 +12,9 @@ class @HUiTouchMenu extends HCoreComponent
             item = $(item)
             target = $(item.data 'touchmenu')
             if target.length
-                menu = target.data 'touchmenu-instance'
+                menu = target.data 'hui-touchmenu-instance'
                 if not menu
-                    options = target.data 'touchmenu-options'
+                    options = target.data 'hui-touchmenu-options'
                     if options and options.position == 'auto'
                         pos = item.offset().left + item.outerWidth()
                         options.position = if pos < $(window).innerWidth() then 'left' else 'right'
@@ -22,7 +22,7 @@ class @HUiTouchMenu extends HCoreComponent
                     item.data 'touchmenu', '#' + menu.id
         $('body').on 'click', '[data-touchmenu]', (event) ->
             id = $(this).data 'touchmenu'
-            menu = $(id).data 'touchmenu-instance'
+            menu = $(id).data 'hui-touchmenu-instance'
             if menu
                 event.preventDefault()
                 menu.toggle()
@@ -51,14 +51,14 @@ class @HUiTouchMenu extends HCoreComponent
         @stack = []
         if @options.clone
             @element = @element.clone()
-            @id = @element.data 'touchmenu-id'
+            @id = @element.data 'hui-touchmenu-id'
             if not @id
-                @id = '__touchmenu-' + (++next_id)
+                @id = '__hui_touchmenu-' + (++next_id)
             @element.attr 'id', @id
-        @element.data 'touchmenu-instance', this
-        @element.addClass 'touchmenu'
+        @element.data 'hui-touchmenu-instance', this
+        @element.addClass 'hui-touchmenu'
         @element.appendTo @body
-        @element.trigger 'touchmenu-init', this
+        @element.trigger 'hui-touchmenu-init', this
         @log 'ctor'
         @log @options
         switch @options.position
@@ -130,6 +130,7 @@ class @HUiTouchMenu extends HCoreComponent
                 overflow: 'auto'
             css[@options.position] = 0
             @body.css css
+        @element.trigger 'hui-touchmenu-reset', this
 
     # progress 0.0 to 1.0
     progress: () =>
@@ -150,12 +151,12 @@ class @HUiTouchMenu extends HCoreComponent
     open: () =>
         @log 'open'
         @reset
+        @element.trigger 'hui-touchmenu-opening', this
         @element.show()
         @overlay.fadeIn()
         css = {}
         options =
-            complete: =>
-                @log 'complete'
+            complete: @on_opened
         if @options.body
             @element.css
                 position: 'absolute'
@@ -181,9 +182,8 @@ class @HUiTouchMenu extends HCoreComponent
         @log 'close'
         css = {}
         options =
-            complete: =>
-                @element.hide()
-                @reset()
+            complete: @on_closed
+        @element.trigger 'hui-touchmenu-closing', this
         if @options.body
             css[@options.position] = 0
             @body.animate css, options
@@ -196,6 +196,15 @@ class @HUiTouchMenu extends HCoreComponent
 
     is_closed: () =>
         return @progress() == 0
+
+    on_opened: () =>
+        @log 'complete'
+        @element.trigger 'hui-touchmenu-opened', this
+
+    on_closed: () =>
+        @element.hide()
+        @element.trigger 'hui-touchmenu-closed', this
+        @reset()
 
 $ ->
     HUiTouchMenu.init()

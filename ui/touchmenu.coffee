@@ -1,17 +1,13 @@
 
-log = (text) ->
-    if console && console.log
-        console.log text
-
 next_id = 0
 
 #
 # A swipe menu for touch devices
 #
-class HikariTouchMenu
+class @HUiTouchMenu extends HCoreComponent
 
     @init: () ->
-        log 'init'
+        @debug 'init'
         $('[data-touchmenu]').each (index, item) ->
             item = $(item)
             target = $(item.data 'touchmenu')
@@ -22,7 +18,7 @@ class HikariTouchMenu
                     if options and options.position == 'auto'
                         pos = item.offset().left + item.outerWidth()
                         options.position = if pos < $(window).innerWidth() then 'left' else 'right'
-                    menu = new HikariTouchMenu target, options
+                    menu = new HUiTouchMenu target, options
                     item.data 'touchmenu', '#' + menu.id
         $('body').on 'click', '[data-touchmenu]', (event) ->
             id = $(this).data 'touchmenu'
@@ -31,12 +27,10 @@ class HikariTouchMenu
                 event.preventDefault()
                 menu.toggle()
             else
-                log 'no touchmenu instance set for: ' + id
+                @debug 'no touchmenu instance set for: ' + id
 
     constructor: (@element, @options) ->
-        @body = $('body')
-        @stack = []
-        default_options =
+        super @options,
             debug: true           # enable console logging
             body: true            # attach to and push with body
             position: 'left'      # menu slidein position
@@ -53,8 +47,8 @@ class HikariTouchMenu
                 snap: 50          # snap distance
             overlay:
                 enable: true      # enable body overlay
-
-        @options = $.extend(default_options, @options)
+        @body = $('body')
+        @stack = []
         if @options.clone
             @element = @element.clone()
             @id = @element.data 'touchmenu-id'
@@ -65,8 +59,8 @@ class HikariTouchMenu
         @element.addClass 'touchmenu'
         @element.appendTo @body
         @element.trigger 'touchmenu-init', this
-        log 'ctor'
-        log @options
+        @log 'ctor'
+        @log @options
         switch @options.position
             when 'left', 'right'
                 @_size = =>
@@ -112,7 +106,7 @@ class HikariTouchMenu
         @reset()
 
     reset: () =>
-        log 'reset'
+        @log 'reset'
         @overlay.fadeOut()
         @element.find('ul ul').hide()
         @stack = []
@@ -150,18 +144,18 @@ class HikariTouchMenu
         return @_size()
 
     toggle: () =>
-        log 'toggle'
+        @log 'toggle'
         @open()
 
     open: () =>
-        log 'open'
+        @log 'open'
         @reset
         @element.show()
         @overlay.fadeIn()
         css = {}
         options =
             complete: =>
-                console.log 'complete'
+                @log 'complete'
         if @options.body
             @element.css
                 position: 'absolute'
@@ -184,7 +178,7 @@ class HikariTouchMenu
             @element.animate css, options
 
     close: () =>
-        log 'close'
+        @log 'close'
         css = {}
         options =
             complete: =>
@@ -202,6 +196,6 @@ class HikariTouchMenu
 
     is_closed: () =>
         return @progress() == 0
+
 $ ->
-    console.log typeof HikariTouchMenu
-    HikariTouchMenu.init()
+    HUiTouchMenu.init()

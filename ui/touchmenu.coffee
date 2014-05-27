@@ -8,9 +8,9 @@ class @HUiTouchMenu extends HCoreComponent
 
     @init: () ->
         @debug 'init'
-        $('[data-touchmenu]').each (index, item) ->
+        $('[data-hui-touchmenu]').each (index, item) ->
             item = $(item)
-            target = $(item.data 'touchmenu')
+            target = $(item.data 'hui-touchmenu')
             if target.length
                 menu = target.data 'hui-touchmenu-instance'
                 if not menu
@@ -19,9 +19,9 @@ class @HUiTouchMenu extends HCoreComponent
                         pos = item.offset().left + item.outerWidth()
                         options.position = if pos < $(window).innerWidth() then 'left' else 'right'
                     menu = new HUiTouchMenu target, options
-                    item.data 'touchmenu', '#' + menu.id
-        $('body').on 'click', '[data-touchmenu]', (event) ->
-            id = $(this).data 'touchmenu'
+                    item.data 'hui-touchmenu', '#' + menu.id
+        $('body').on 'click', '[data-hui-touchmenu]', (event) ->
+            id = $(this).data 'hui-touchmenu'
             menu = $(id).data 'hui-touchmenu-instance'
             if menu
                 event.preventDefault()

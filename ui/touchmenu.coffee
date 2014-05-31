@@ -32,11 +32,12 @@ class @HUiTouchMenu extends HCoreComponent
     constructor: (@element, @options) ->
         super @options,
             debug: true           # enable console logging
-            body: true            # attach to and push with body
+            body: false            # attach to and push with body
             position: 'left'      # menu slidein position
             clone: true           # clone menu element
             animation:
                 duration: 500     # duration for open & close animations
+                easing: 'linear'
             stack:
                 enable: true      # enable submenu navigation
                 parallax: 20      # amount to push parent menus
@@ -156,6 +157,8 @@ class @HUiTouchMenu extends HCoreComponent
         @overlay.fadeIn()
         css = {}
         options =
+            easing: @options.animation.easing
+            duration: @options.animation.duration
             complete: @on_opened
         if @options.body
             @element.css
@@ -182,6 +185,8 @@ class @HUiTouchMenu extends HCoreComponent
         @log 'close'
         css = {}
         options =
+            easing: @options.animation.easing
+            duration: @options.animation.duration
             complete: @on_closed
         @element.trigger 'hui-touchmenu-closing', this
         if @options.body

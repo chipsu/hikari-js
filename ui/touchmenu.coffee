@@ -36,7 +36,7 @@ class @HUiTouchMenu extends HCoreComponent
             position: 'left'      # menu slidein position
             clone: true           # clone menu element
             animation:
-                duration: 500     # duration for open & close animations
+                duration: 250     # duration for open & close animations
                 easing: 'linear'
             stack:
                 enable: true      # enable submenu navigation

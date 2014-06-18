@@ -90,10 +90,10 @@ class @HUiTouchMenu extends HCoreComponent
             ul = li.find '> ul'
             if ul.length
                 event.preventDefault()
+                # TODO: direction & overflow
                 ul.css
-                    backgroundColor: '#666'
                     position: 'fixed'
-                    left: @size()
+                    left: -@size()
                     top: 0
                     bottom: 0
                     width: @size()
@@ -103,7 +103,7 @@ class @HUiTouchMenu extends HCoreComponent
                 ul.animate
                     left: '0px'
                 @element.animate
-                    left: '-=' + 20 + 'px'
+                    left: '-=' + @options.stack.parallax + 'px'
         @reset()
 
     reset: () =>

@@ -38,11 +38,13 @@ class @HUiTouchMenu extends HCoreComponent
             animation:
                 duration: 250     # duration for open & close animations
                 easing: 'linear'
-            stack:
+            submenu:
                 enable: true      # enable submenu navigation
-                parallax: 20      # amount to push parent menus
-                offset: 0         # final offset to previous menu
-                direction: 'auto' # stack slidein direction (auto = opposite of menu direction)
+                mode: 'stack'
+                stack:
+                    parallax: 20      # amount to push parent menus
+                    offset: 0         # final offset to previous menu
+                    direction: 'auto' # stack slidein direction (auto = opposite of menu direction)
             touch:
                 enable: true      # enable touch events
                 snap: 50          # snap distance
@@ -84,26 +86,30 @@ class @HUiTouchMenu extends HCoreComponent
         @overlay.appendTo @body
         @overlay.on 'click', @close
         $(window).on 'resize', @reset
-        @element.on 'click', (event) =>
-            target = $(event.target)
-            li = target.closest 'li'
-            ul = li.find '> ul'
-            if ul.length
-                event.preventDefault()
-                # TODO: direction & overflow
-                ul.css
-                    position: 'fixed'
-                    left: -@size()
-                    top: 0
-                    bottom: 0
-                    width: @size()
-                    zIndex: 9000 + @stack.length
-                @stack.push ul
-                ul.show()
-                ul.animate
-                    left: '0px'
-                @element.animate
-                    left: '-=' + @options.stack.parallax + 'px'
+        if @options.submenu.enable
+            @element.on 'click', (event) =>
+                target = $(event.target)
+                li = target.closest 'li'
+                ul = li.find '> ul'
+                if ul.length
+                    event.preventDefault()
+                    if @options.submenu.mode == 'xstack'
+                        # TODO: direction & overflow
+                        ul.css
+                            position: 'fixed'
+                            left: -@size()
+                            top: 0
+                            bottom: 0
+                            width: @size()
+                            zIndex: 9000 + @stack.length
+                        @stack.push ul
+                        ul.show()
+                        ul.animate
+                            left: '0px'
+                        @element.animate
+                            left: '-=' + @options.submenu.stack.parallax + 'px'
+                    else
+                        ul.slideToggle()
         @reset()
 
     reset: () =>

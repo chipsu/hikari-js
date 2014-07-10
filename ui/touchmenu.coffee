@@ -40,7 +40,7 @@ class @HUiTouchMenu extends HCoreComponent
                 easing: 'linear'
             submenu:
                 enable: true      # enable submenu navigation
-                mode: 'stack'
+                mode: 'toggle'     # stack or toggle
                 stack:
                     parallax: 20      # amount to push parent menus
                     offset: 0         # final offset to previous menu
@@ -87,13 +87,17 @@ class @HUiTouchMenu extends HCoreComponent
         @overlay.on 'click', @close
         $(window).on 'resize', @reset
         if @options.submenu.enable
+            @element.find('li > ul').each (index, value) =>
+                value = $(value)
+                value.closest('li').addClass 'hui-has-children'
+                #value.addClass 'hui-closed'
             @element.on 'click', (event) =>
                 target = $(event.target)
                 li = target.closest 'li'
                 ul = li.find '> ul'
                 if ul.length
                     event.preventDefault()
-                    if @options.submenu.mode == 'xstack'
+                    if @options.submenu.mode == 'stack'
                         # TODO: direction & overflow
                         ul.css
                             position: 'fixed'
@@ -110,6 +114,7 @@ class @HUiTouchMenu extends HCoreComponent
                             left: '-=' + @options.submenu.stack.parallax + 'px'
                     else
                         ul.slideToggle()
+                        li.toggleClass 'hui-open'
         @reset()
 
     reset: () =>
@@ -158,6 +163,7 @@ class @HUiTouchMenu extends HCoreComponent
     open: () =>
         @log 'open'
         @reset
+        @body.addClass 'hui-touchmenu-opening'
         @element.trigger 'hui-touchmenu-opening', this
         @element.show()
         @overlay.fadeIn()
@@ -194,6 +200,7 @@ class @HUiTouchMenu extends HCoreComponent
             easing: @options.animation.easing
             duration: @options.animation.duration
             complete: @on_closed
+        @body.addClass 'hui-touchmenu-closing'
         @element.trigger 'hui-touchmenu-closing', this
         if @options.body
             css[@options.position] = 0
@@ -210,10 +217,14 @@ class @HUiTouchMenu extends HCoreComponent
 
     on_opened: () =>
         @log 'complete'
+        @body.addClass 'hui-touchmenu-open'
+        @body.removeClass 'hui-touchmenu-opening'
         @element.trigger 'hui-touchmenu-opened', this
 
     on_closed: () =>
         @element.hide()
+        @body.addClass 'hui-touchmenu-closed'
+        @body.removeClass 'hui-touchmenu-closing'
         @element.trigger 'hui-touchmenu-closed', this
         @reset()
 
